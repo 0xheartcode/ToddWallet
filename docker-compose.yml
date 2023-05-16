@@ -1,0 +1,46 @@
+services:
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "2665:2665"
+    depends_on:
+      - db
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "2666:2666"
+    depends_on:
+      - db
+  db:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "2667:27017"
+    volumes:
+      - database:/data/db
+  caddy:
+    image: dunglas/mercure
+    restart: unless-stopped
+    environment:
+      # Uncomment the following line to disable HTTPS
+      SERVER_NAME: ':2668'
+      MERCURE_PUBLISHER_JWT_KEY: '212324p'
+      MERCURE_SUBSCRIBER_JWT_KEY: '212324s'
+      MERCURE_EXTRA_DIRECTIVES: |-
+        cors_origins *
+        anonymous
+    # Uncomment the following line to enable the development mode
+    command: /usr/bin/caddy run --config /etc/caddy/Caddyfile.dev
+    ports:
+      - "2668:2668"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+volumes:
+  database:
+  caddy_data:
+  caddy_config:
