@@ -8,3 +8,6 @@
 *.njsproj
 *.sln
 *.sw?
+*.env
+
+9_database/
